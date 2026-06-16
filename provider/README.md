@@ -1,86 +1,86 @@
-# Terraform Provider: Guance
+# Terraform Provider: TrueWatch
 
-The Guance Provider provides resources to manage [Guance Cloud](https://en.guance.com/) resources.
+The TrueWatch Provider provides resources to manage [TrueWatch Cloud](https://en.truewatch.com/) resources.
 
 To learn the basics of Terraform using this provider, follow the hands-on get started tutorials.
 
 Interested in the provider's latest features, or want to make sure you're up to date? Check out the changelog for version information and release notes.
 
-## Authenticating to Guance Cloud
+## Authenticating to TrueWatch Cloud
 
-Terraform supports a number of different methods for authenticating to Guance Cloud:
+Terraform supports a number of different methods for authenticating to TrueWatch Cloud:
 
-* [Workspace Key](https://console.guance.com/workspace/apiManage)
+* [Workspace Key](https://console.truewatch.com/workspace/apiManage)
 
 ## Usage
 
 ```terraform
 # We strongly recommend using the required_providers block to set the
-# Guance Cloud Provider source being used
+# TrueWatch Cloud Provider source being used
 terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    guance = {
-      source = "GuanceCloud/guance"
+    truewatch = {
+      source = "TrueWatchTech/truewatch"
     }
   }
 }
 
 // We also recommend use secret environment variables to set the provider,
-// Such as GUANCE_ACCESS_TOKEN and GUANCE_REGION
-provider "guance" {
+// Such as TRUEWATCH_ACCESS_TOKEN and TRUEWATCH_REGION
+provider "truewatch" {
   # access_token = "your access token, recommend store in environment variable"
   region = "hangzhou"
-  # end_point = "https://openapi.guance.com"
+  # end_point = "https://us1-openapi.truewatch.com"
 }
 ```
 
 ## More Examples
 
-* [Example Source Code](https://github.com/GuanceCloud/terraform-provider-guance/tree/main/examples)
+* [Example Source Code](https://github.com/TrueWatchTech/terraform-provider-truewatch/tree/main/examples)
 
 ## Monitor Module
 
-The monitor-related Terraform resources are based on Guance Forethought OpenAPI checker endpoints.
+The monitor-related Terraform resources are based on TrueWatch Forethought OpenAPI checker endpoints.
 
-Use `guance_monitor` when you want to manage a monitor/checker with structured Terraform fields. Use `guance_monitor_json` when you want to import, replace, or manage a monitor from the checker JSON export format.
+Use `truewatch_monitor` when you want to manage a monitor/checker with structured Terraform fields. Use `truewatch_monitor_json` when you want to import, replace, or manage a monitor from the checker JSON export format.
 
 Available monitor resources and data sources:
 
-* `guance_monitor` - manages monitor checker rules with structured fields.
-* `guance_monitor_json` - manages monitor checker rules with JSON import/export semantics.
-* `guance_monitor` data source - reads one existing monitor/checker by `uuid` or exact `name`.
-* `guance_monitors` data source - lists existing monitors/checkers by search and optional filters.
+* `truewatch_monitor` - manages monitor checker rules with structured fields.
+* `truewatch_monitor_json` - manages monitor checker rules with JSON import/export semantics.
+* `truewatch_monitor` data source - reads one existing monitor/checker by `uuid` or exact `name`.
+* `truewatch_monitors` data source - lists existing monitors/checkers by search and optional filters.
 
-Note: updating `guance_monitor.secret` from a non-empty value to an empty string currently depends on Forethought OpenAPI behavior. The current OpenAPI implementation accepts the request but keeps the old secret, so avoid using an empty secret to clear an existing value until the OpenAPI contract is adjusted.
+Note: updating `truewatch_monitor.secret` from a non-empty value to an empty string currently depends on Forethought OpenAPI behavior. The current OpenAPI implementation accepts the request but keeps the old secret, so avoid using an empty secret to clear an existing value until the OpenAPI contract is adjusted.
 
 ## Alert Module
 
-The alert-related Terraform resources are based on Guance Forethought OpenAPI endpoints.
+The alert-related Terraform resources are based on TrueWatch Forethought OpenAPI endpoints.
 
 Typical dependency flow:
 
 ```hcl
-guance_notify_object
-  -> guance_alert_policy.alert_opt.alert_target.targets.to
+truewatch_notify_object
+  -> truewatch_alert_policy.alert_opt.alert_target.targets.to
 
-guance_alert_policy_notice_date
-  -> guance_alert_policy.alert_opt.alert_target.custom_date_uuids
+truewatch_alert_policy_notice_date
+  -> truewatch_alert_policy.alert_opt.alert_target.custom_date_uuids
 
-guance_alert_policy
-  -> guance_mute.mute_ranges.alert_policy_uuid
+truewatch_alert_policy
+  -> truewatch_mute.mute_ranges.alert_policy_uuid
 ```
 
 Available alert resources:
 
-* `guance_notify_object` - manages alert notification objects.
-* `guance_alert_policy_notice_date` - manages custom notice dates for alert policies.
-* `guance_alert_policy` - manages alert delivery, aggregation, silence, and notification targets.
-* `guance_mute` - manages mute rules for alert policies, checkers, tags, or custom ranges.
+* `truewatch_notify_object` - manages alert notification objects.
+* `truewatch_alert_policy_notice_date` - manages custom notice dates for alert policies.
+* `truewatch_alert_policy` - manages alert delivery, aggregation, silence, and notification targets.
+* `truewatch_mute` - manages mute rules for alert policies, checkers, tags, or custom ranges.
 
 Each alert resource also has a matching data source with the same Terraform type name. The data source supports lookup by either `uuid` or exact `name`, and fails if name lookup does not return exactly one object.
 
-See the `guance_alert_policy` resource documentation for a full chain example that connects notification objects, custom notice dates, alert policies, and mute rules.
+See the `truewatch_alert_policy` resource documentation for a full chain example that connects notification objects, custom notice dates, alert policies, and mute rules.
 
 Note: the Forethought UI has an alert policy enable/disable route, but it is not exported in the Forethought OpenAPI alert policy module. The Terraform resource manages the exported v2 alert policy fields.

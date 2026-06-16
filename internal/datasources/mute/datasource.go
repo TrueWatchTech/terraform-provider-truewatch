@@ -11,8 +11,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/api"
-	resourcemute "github.com/GuanceCloud/terraform-provider-guance/internal/resources/mute"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/api"
+	resourcemute "github.com/TrueWatchTech/terraform-provider-truewatch/internal/resources/mute"
 )
 
 var (
@@ -66,7 +66,7 @@ func (d *muteDataSource) Metadata(_ context.Context, req datasource.MetadataRequ
 func (d *muteDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = dsschema.Schema{
 		Description:         "Lookup a mute rule by UUID or exact name.",
-		MarkdownDescription: "The `guance_mute` data source reads an existing Guance mute rule by `uuid` or exact `name`.",
+		MarkdownDescription: "The `truewatch_mute` data source reads an existing TrueWatch mute rule by `uuid` or exact `name`.",
 		Attributes: map[string]dsschema.Attribute{
 			"uuid": dsschema.StringAttribute{
 				Description: "The UUID of the mute rule.",

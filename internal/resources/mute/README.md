@@ -1,21 +1,21 @@
-# guance_mute
+# truewatch_mute
 
-The `guance_mute` resource manages Guance mute rules. Mute rules can silence monitors, alert policies, monitor tags, or custom resource ranges.
+The `truewatch_mute` resource manages TrueWatch mute rules. Mute rules can silence monitors, alert policies, monitor tags, or custom resource ranges.
 
 ## Example Usage
 
 Mute an alert policy for a one-time window:
 
 ```hcl
-resource "guance_mute" "alert_policy" {
+resource "truewatch_mute" "alert_policy" {
   name        = "terraform-alert-policy-mute"
   description = "Managed by Terraform"
   type        = "alertPolicy"
   timezone    = "Asia/Shanghai"
 
   mute_ranges = [{
-    name              = guance_alert_policy.example.name
-    alert_policy_uuid = guance_alert_policy.example.uuid
+    name              = truewatch_alert_policy.example.name
+    alert_policy_uuid = truewatch_alert_policy.example.uuid
   }]
 
   repeat_time_set = 0
@@ -31,13 +31,13 @@ resource "guance_mute" "alert_policy" {
 Repeated mute:
 
 ```hcl
-resource "guance_mute" "weekly" {
+resource "truewatch_mute" "weekly" {
   name     = "terraform-weekly-mute"
   type     = "alertPolicy"
   timezone = "Asia/Shanghai"
 
   mute_ranges = [{
-    alert_policy_uuid = guance_alert_policy.example.uuid
+    alert_policy_uuid = truewatch_alert_policy.example.uuid
   }]
 
   repeat_time_set = 1
@@ -56,13 +56,13 @@ resource "guance_mute" "weekly" {
 Notify before a mute starts:
 
 ```hcl
-resource "guance_mute" "with_notify" {
+resource "truewatch_mute" "with_notify" {
   name     = "terraform-mute-with-notify"
   type     = "alertPolicy"
   timezone = "Asia/Shanghai"
 
   mute_ranges = [{
-    alert_policy_uuid = guance_alert_policy.example.uuid
+    alert_policy_uuid = truewatch_alert_policy.example.uuid
   }]
 
   repeat_time_set = 0
@@ -73,7 +73,7 @@ resource "guance_mute" "with_notify" {
 
   notify_targets = [{
     type = "notifyObject"
-    to   = [guance_notify_object.example.uuid]
+    to   = [truewatch_notify_object.example.uuid]
   }]
 }
 ```
@@ -124,24 +124,24 @@ resource "guance_mute" "with_notify" {
 
 ## Data Source
 
-The `guance_mute` data source reads an existing mute rule by `uuid` or exact `name`.
+The `truewatch_mute` data source reads an existing mute rule by `uuid` or exact `name`.
 
 Lookup by name:
 
 ```hcl
-data "guance_mute" "example" {
+data "truewatch_mute" "example" {
   name = "terraform-alert-policy-mute"
 }
 
 output "muted_alert_policy_uuid" {
-  value = data.guance_mute.example.mute_ranges[0].alert_policy_uuid
+  value = data.truewatch_mute.example.mute_ranges[0].alert_policy_uuid
 }
 ```
 
 Lookup by UUID:
 
 ```hcl
-data "guance_mute" "example" {
+data "truewatch_mute" "example" {
   uuid = "mute_xxx"
 }
 ```
@@ -151,5 +151,5 @@ Name lookup must match exactly one mute rule. The data source exports all resour
 ## Import
 
 ```shell
-terraform import guance_mute.example mute_xxx
+terraform import truewatch_mute.example mute_xxx
 ```

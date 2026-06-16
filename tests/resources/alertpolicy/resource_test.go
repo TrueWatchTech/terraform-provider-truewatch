@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/provider"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/provider"
 )
 
 func TestAccAlertpolicy(t *testing.T) {
@@ -15,7 +15,7 @@ func TestAccAlertpolicy(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: provider.Config + `
-resource "guance_notify_object" "demo" {
+resource "truewatch_notify_object" "demo" {
   type = "simpleHTTPRequest"
   name = "oac-alert-policy-demo"
 
@@ -28,7 +28,7 @@ resource "guance_notify_object" "demo" {
   })
 }
 
-resource "guance_alert_policy_notice_date" "demo" {
+resource "truewatch_alert_policy_notice_date" "demo" {
   name = "oac-alert-policy-date-demo"
 
   notice_dates = [
@@ -37,7 +37,7 @@ resource "guance_alert_policy_notice_date" "demo" {
   ]
 }
 
-resource "guance_alert_policy" "demo" {
+resource "truewatch_alert_policy" "demo" {
   name          = "oac-alert-policy-demo"
   desc          = "acceptance alert policy"
   rule_timezone = "Asia/Shanghai"
@@ -50,12 +50,12 @@ resource "guance_alert_policy" "demo" {
 
     alert_target = [{
       name              = "default"
-      custom_date_uuids = [guance_alert_policy_notice_date.demo.uuid]
+      custom_date_uuids = [truewatch_alert_policy_notice_date.demo.uuid]
       custom_start_time = "09:30:00"
       custom_duration   = 3600
 
       targets = [{
-        to     = [guance_notify_object.demo.uuid]
+        to     = [truewatch_notify_object.demo.uuid]
         status = "critical,error,warning"
       }]
     }]
@@ -63,9 +63,9 @@ resource "guance_alert_policy" "demo" {
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "name", "oac-alert-policy-demo"),
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "alert_opt.alert_type", "status"),
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "alert_opt.agg_interval", "60"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "name", "oac-alert-policy-demo"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "alert_opt.alert_type", "status"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "alert_opt.agg_interval", "60"),
 				),
 			},
 
@@ -80,7 +80,7 @@ func TestAccAlertpolicyComplexStatus(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: provider.Config + `
-resource "guance_notify_object" "demo" {
+resource "truewatch_notify_object" "demo" {
   type = "simpleHTTPRequest"
   name = "oac-alert-policy-complex-demo"
 
@@ -93,7 +93,7 @@ resource "guance_notify_object" "demo" {
   })
 }
 
-resource "guance_alert_policy_notice_date" "demo" {
+resource "truewatch_alert_policy_notice_date" "demo" {
   name = "oac-alert-policy-complex-date-demo"
 
   notice_dates = [
@@ -102,7 +102,7 @@ resource "guance_alert_policy_notice_date" "demo" {
   ]
 }
 
-resource "guance_alert_policy" "demo" {
+resource "truewatch_alert_policy" "demo" {
   name          = "oac-alert-policy-complex-demo"
   desc          = "acceptance complex status alert policy"
   rule_timezone = "Asia/Shanghai"
@@ -125,26 +125,26 @@ resource "guance_alert_policy" "demo" {
 
     alert_target = [{
       name              = "complex route"
-      custom_date_uuids = [guance_alert_policy_notice_date.demo.uuid]
+      custom_date_uuids = [truewatch_alert_policy_notice_date.demo.uuid]
       custom_start_time = "09:30:00"
       custom_duration   = 3600
 
       targets = [
         {
-          to            = [guance_notify_object.demo.uuid]
+          to            = [truewatch_notify_object.demo.uuid]
           status        = "critical,error"
           filter_string = "host:oac-alert-policy-complex service:terraform"
           tags = {
             service = ["oac-alert-policy-complex"]
           }
           upgrade_targets = [{
-            to       = [guance_notify_object.demo.uuid]
+            to       = [truewatch_notify_object.demo.uuid]
             duration = 300
             to_way   = ["mail"]
           }]
         },
         {
-          to        = [guance_notify_object.demo.uuid]
+          to        = [truewatch_notify_object.demo.uuid]
           status    = "critical"
           df_source = "security"
         },
@@ -154,11 +154,11 @@ resource "guance_alert_policy" "demo" {
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "alert_opt.agg_type", "byFields"),
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "alert_opt.ignore_ok", "true"),
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "alert_opt.silent_timeout_by_status_enable", "true"),
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "alert_opt.alert_target.0.targets.0.upgrade_targets.0.duration", "300"),
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "alert_opt.alert_target.0.targets.1.df_source", "security"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "alert_opt.agg_type", "byFields"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "alert_opt.ignore_ok", "true"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "alert_opt.silent_timeout_by_status_enable", "true"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "alert_opt.alert_target.0.targets.0.upgrade_targets.0.duration", "300"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "alert_opt.alert_target.0.targets.1.df_source", "security"),
 				),
 			},
 		},
@@ -171,9 +171,9 @@ func TestAccAlertpolicyMemberMode(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: provider.Config + `
-data "guance_members" "demo" {}
+data "truewatch_members" "demo" {}
 
-resource "guance_notify_object" "demo" {
+resource "truewatch_notify_object" "demo" {
   type = "simpleHTTPRequest"
   name = "oac-alert-policy-member-demo"
 
@@ -186,7 +186,7 @@ resource "guance_notify_object" "demo" {
   })
 }
 
-resource "guance_alert_policy" "demo" {
+resource "truewatch_alert_policy" "demo" {
   name          = "oac-alert-policy-member-demo"
   desc          = "acceptance member alert policy"
   rule_timezone = "Asia/Shanghai"
@@ -201,10 +201,10 @@ resource "guance_alert_policy" "demo" {
 
       alert_info = [{
         name        = "member route"
-        member_info = [data.guance_members.demo.members[0].uuid]
+        member_info = [data.truewatch_members.demo.members[0].uuid]
 
         targets = [{
-          to     = [guance_notify_object.demo.uuid]
+          to     = [truewatch_notify_object.demo.uuid]
           status = "critical,error,warning"
         }]
       }]
@@ -213,9 +213,9 @@ resource "guance_alert_policy" "demo" {
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "alert_opt.alert_type", "member"),
-					resource.TestCheckResourceAttr("guance_alert_policy.demo", "alert_opt.alert_target.0.alert_info.0.name", "member route"),
-					resource.TestCheckResourceAttrSet("guance_alert_policy.demo", "alert_opt.alert_target.0.alert_info.0.member_info.0"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "alert_opt.alert_type", "member"),
+					resource.TestCheckResourceAttr("truewatch_alert_policy.demo", "alert_opt.alert_target.0.alert_info.0.name", "member route"),
+					resource.TestCheckResourceAttrSet("truewatch_alert_policy.demo", "alert_opt.alert_target.0.alert_info.0.member_info.0"),
 				),
 			},
 		},

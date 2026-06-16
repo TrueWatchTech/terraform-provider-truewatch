@@ -1,10 +1,10 @@
-# Guance Data Source Examples
+# TrueWatch Data Source Examples
 
-This example shows how to look up existing Guance objects with Terraform data sources.
+This example shows how to look up existing TrueWatch objects with Terraform data sources.
 
 ## Usage
 
-Set `GUANCE_ACCESS_TOKEN` and any lookup variables you need, then run:
+Set `TRUEWATCH_ACCESS_TOKEN` and any lookup variables you need, then run:
 
 ```shell
 terraform init

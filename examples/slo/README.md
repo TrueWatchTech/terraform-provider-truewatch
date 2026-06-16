@@ -1,13 +1,13 @@
 # SLO Example
 
-> Note: `guance_slo` is not registered by the provider in the current release branch. This example is kept as implementation reference only and cannot be applied until `guance_slo` is enabled in `provider/resources.go`.
+> Note: `truewatch_slo` is not registered by the provider in the current release branch. This example is kept as implementation reference only and cannot be applied until `truewatch_slo` is enabled in `provider/resources.go`.
 
-This example demonstrates how to create an SLO (Service Level Objective) resource using the Guance Cloud Terraform provider.
+This example demonstrates how to create an SLO (Service Level Objective) resource using the TrueWatch Cloud Terraform provider.
 
 ## Prerequisites
 
 1. [Terraform](https://www.terraform.io/downloads.html) 1.0+ installed
-2. Guance Cloud account with API access
+2. TrueWatch Cloud account with API access
 3. API key configured in your environment
 
 ## Configuration

@@ -5,7 +5,7 @@ import (
 	"net/url"
 	"strings"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/consts"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/consts"
 )
 
 // AlertPolicy represents the alert policy structure for API requests

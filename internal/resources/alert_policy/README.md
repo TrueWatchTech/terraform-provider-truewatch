@@ -1,13 +1,13 @@
 # Alert Policy Resource
 
-The `guance_alert_policy` resource manages Guance alert policies. Alert policies control alert aggregation, silence behavior, and notification targets.
+The `truewatch_alert_policy` resource manages TrueWatch alert policies. Alert policies control alert aggregation, silence behavior, and notification targets.
 
 ## Example Usage
 
 ### Basic Alert Policy
 
 ```hcl
-resource "guance_alert_policy" "example" {
+resource "truewatch_alert_policy" "example" {
   name          = "High CPU Alert"
   desc          = "Alert when CPU usage exceeds threshold"
   rule_timezone = "Asia/Shanghai"
@@ -33,7 +33,7 @@ resource "guance_alert_policy" "example" {
 ### Alert Policy with Escalation
 
 ```hcl
-resource "guance_alert_policy" "escalation_example" {
+resource "truewatch_alert_policy" "escalation_example" {
   name          = "Database Alert"
   desc          = "Alert on database connectivity issues"
   rule_timezone = "Asia/Shanghai"
@@ -61,7 +61,7 @@ resource "guance_alert_policy" "escalation_example" {
 ### Alert Policy with Custom Notice Dates
 
 ```hcl
-resource "guance_alert_policy_notice_date" "holiday" {
+resource "truewatch_alert_policy_notice_date" "holiday" {
   name                     = "Holiday notice dates"
   skip_ref_check_on_delete = false
 
@@ -71,7 +71,7 @@ resource "guance_alert_policy_notice_date" "holiday" {
   ]
 }
 
-resource "guance_alert_policy" "custom_date_example" {
+resource "truewatch_alert_policy" "custom_date_example" {
   name          = "Holiday Alert"
   rule_timezone = "Asia/Shanghai"
 
@@ -80,7 +80,7 @@ resource "guance_alert_policy" "custom_date_example" {
 
     alert_target = [{
       name              = "Holiday notification"
-      custom_date_uuids = [guance_alert_policy_notice_date.holiday.uuid]
+      custom_date_uuids = [truewatch_alert_policy_notice_date.holiday.uuid]
       custom_start_time = "09:30:00"
       custom_duration   = 3600
 
@@ -96,14 +96,14 @@ resource "guance_alert_policy" "custom_date_example" {
 ### Full Alert Chain
 
 ```hcl
-resource "guance_notify_object" "ops" {
+resource "truewatch_notify_object" "ops" {
   name                = "Ops Webhook"
   type                = "http"
   opt_set             = jsonencode({ url = "https://example.com/alert" })
   open_permission_set = false
 }
 
-resource "guance_alert_policy_notice_date" "holiday" {
+resource "truewatch_alert_policy_notice_date" "holiday" {
   name                     = "Holiday notice dates"
   skip_ref_check_on_delete = false
 
@@ -113,7 +113,7 @@ resource "guance_alert_policy_notice_date" "holiday" {
   ]
 }
 
-resource "guance_alert_policy" "ops" {
+resource "truewatch_alert_policy" "ops" {
   name          = "Ops Alert Policy"
   desc          = "Route severe production alerts"
   rule_timezone = "Asia/Shanghai"
@@ -136,17 +136,17 @@ resource "guance_alert_policy" "ops" {
 
     alert_target = [{
       name              = "Business hours"
-      custom_date_uuids = [guance_alert_policy_notice_date.holiday.uuid]
+      custom_date_uuids = [truewatch_alert_policy_notice_date.holiday.uuid]
       custom_start_time = "09:00:00"
       custom_duration   = 28800
 
       targets = [{
-        to            = [guance_notify_object.ops.uuid]
+        to            = [truewatch_notify_object.ops.uuid]
         status        = "critical,error"
         filter_string = "`service` IN ['checkout']"
 
         upgrade_targets = [{
-          to       = [guance_notify_object.ops.uuid]
+          to       = [truewatch_notify_object.ops.uuid]
           duration = 900
         }]
       }]
@@ -154,7 +154,7 @@ resource "guance_alert_policy" "ops" {
   }
 }
 
-resource "guance_mute" "maintenance" {
+resource "truewatch_mute" "maintenance" {
   name        = "Ops Alert Maintenance"
   type        = "alertPolicy"
   timezone    = "Asia/Shanghai"
@@ -162,7 +162,7 @@ resource "guance_mute" "maintenance" {
   end_time    = "2026/06/12 02:00:00"
 
   mute_ranges = [{
-    alert_policy_uuid = guance_alert_policy.ops.uuid
+    alert_policy_uuid = truewatch_alert_policy.ops.uuid
   }]
 }
 ```
@@ -170,9 +170,9 @@ resource "guance_mute" "maintenance" {
 ### Alert Policy by Member
 
 ```hcl
-data "guance_members" "all" {}
+data "truewatch_members" "all" {}
 
-resource "guance_alert_policy" "member_example" {
+resource "truewatch_alert_policy" "member_example" {
   name          = "Member Alert"
   desc          = "Route alerts by member"
   rule_timezone = "Asia/Shanghai"
@@ -187,7 +187,7 @@ resource "guance_alert_policy" "member_example" {
 
       alert_info = [{
         name        = "Owner route"
-        member_info = [data.guance_members.all.members[0].uuid]
+        member_info = [data.truewatch_members.all.members[0].uuid]
 
         targets = [{
           to     = ["notify_xxx"]
@@ -236,28 +236,28 @@ The Forethought UI exposes alert policy enable/disable through `/alert_policy/se
 
 ## Data Source
 
-The `guance_alert_policy` data source reads an existing alert policy by `uuid` or exact `name`.
+The `truewatch_alert_policy` data source reads an existing alert policy by `uuid` or exact `name`.
 
 Lookup by name:
 
 ```hcl
-data "guance_alert_policy" "example" {
+data "truewatch_alert_policy" "example" {
   name = "High CPU Alert"
 }
 
 output "alert_policy_uuid" {
-  value = data.guance_alert_policy.example.uuid
+  value = data.truewatch_alert_policy.example.uuid
 }
 
 output "first_notify_object" {
-  value = data.guance_alert_policy.example.alert_opt.alert_target[0].targets[0].to[0]
+  value = data.truewatch_alert_policy.example.alert_opt.alert_target[0].targets[0].to[0]
 }
 ```
 
 Lookup by UUID:
 
 ```hcl
-data "guance_alert_policy" "example" {
+data "truewatch_alert_policy" "example" {
   uuid = "altpl_xxx"
 }
 ```
@@ -282,5 +282,5 @@ Name lookup must match exactly one alert policy. The data source exports:
 ## Import
 
 ```bash
-terraform import guance_alert_policy.example altpl_xxx
+terraform import truewatch_alert_policy.example altpl_xxx
 ```

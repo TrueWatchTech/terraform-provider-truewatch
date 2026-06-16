@@ -29,19 +29,19 @@ variable "monitor_name" {
 }
 
 variable "monitor_type" {
-  description = "Optional checker type filter for guance_monitors, such as simpleCheck. Leave empty to list all monitor/checker types."
+  description = "Optional checker type filter for truewatch_monitors, such as simpleCheck. Leave empty to list all monitor/checker types."
   type        = string
   default     = ""
 }
 
 variable "monitor_search" {
-  description = "Optional monitor search keyword for guance_monitors."
+  description = "Optional monitor search keyword for truewatch_monitors."
   type        = string
   default     = ""
 }
 
 variable "monitor_status" {
-  description = "Optional monitor status filter for guance_monitors, such as 0 or 2."
+  description = "Optional monitor status filter for truewatch_monitors, such as 0 or 2."
   type        = string
   default     = ""
 }

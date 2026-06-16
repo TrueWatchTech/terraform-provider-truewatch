@@ -1,11 +1,11 @@
 # Alert Policy Notice Date Resource
 
-The `guance_alert_policy_notice_date` resource manages custom notice dates for Guance alert policies. These dates can be referenced by `guance_alert_policy.alert_opt.alert_target.custom_date_uuids`.
+The `truewatch_alert_policy_notice_date` resource manages custom notice dates for TrueWatch alert policies. These dates can be referenced by `truewatch_alert_policy.alert_opt.alert_target.custom_date_uuids`.
 
 ## Example Usage
 
 ```hcl
-resource "guance_alert_policy_notice_date" "example" {
+resource "truewatch_alert_policy_notice_date" "example" {
   name                     = "Holiday notice dates"
   skip_ref_check_on_delete = false
 
@@ -22,7 +22,7 @@ resource "guance_alert_policy_notice_date" "example" {
 |------|------|----------|-------------|
 | `name` | string | Yes | The custom notice date name. The backend stores up to 64 characters. |
 | `notice_dates` | list(string) | Yes | Custom notice dates. Each value must use `YYYY/MM/DD` format. Up to 366 dates are allowed. |
-| `skip_ref_check_on_delete` | bool | No | Whether deletion bypasses backend reference checks. Defaults to `true` for compatibility. Set to `false` to let Guance reject deletion while the date is referenced by an alert policy. |
+| `skip_ref_check_on_delete` | bool | No | Whether deletion bypasses backend reference checks. Defaults to `true` for compatibility. Set to `false` to let TrueWatch reject deletion while the date is referenced by an alert policy. |
 
 ## Attribute Reference
 
@@ -35,16 +35,16 @@ resource "guance_alert_policy_notice_date" "example" {
 
 ## Data Source
 
-The `guance_alert_policy_notice_date` data source reads an existing custom notice date by `uuid` or exact `name`.
+The `truewatch_alert_policy_notice_date` data source reads an existing custom notice date by `uuid` or exact `name`.
 
 Lookup by name:
 
 ```hcl
-data "guance_alert_policy_notice_date" "holiday" {
+data "truewatch_alert_policy_notice_date" "holiday" {
   name = "Holiday notice dates"
 }
 
-resource "guance_alert_policy" "example" {
+resource "truewatch_alert_policy" "example" {
   name          = "Holiday Alert"
   rule_timezone = "Asia/Shanghai"
 
@@ -52,7 +52,7 @@ resource "guance_alert_policy" "example" {
     alert_type = "status"
 
     alert_target = [{
-      custom_date_uuids = [data.guance_alert_policy_notice_date.holiday.uuid]
+      custom_date_uuids = [data.truewatch_alert_policy_notice_date.holiday.uuid]
 
       targets = [{
         to     = ["notify_xxx"]
@@ -66,7 +66,7 @@ resource "guance_alert_policy" "example" {
 Lookup by UUID:
 
 ```hcl
-data "guance_alert_policy_notice_date" "holiday" {
+data "truewatch_alert_policy_notice_date" "holiday" {
   uuid = "ndate_xxx"
 }
 ```
@@ -76,5 +76,5 @@ Name lookup must match exactly one notice date. The data source exports `uuid`, 
 ## Import
 
 ```bash
-terraform import guance_alert_policy_notice_date.example ndate_xxx
+terraform import truewatch_alert_policy_notice_date.example ndate_xxx
 ```

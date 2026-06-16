@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/api"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/api"
 )
 
 func TestStateFromNotifyObjectContentCanonicalizesOptSet(t *testing.T) {

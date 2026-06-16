@@ -1,8 +1,8 @@
-# Guance Synthetics Test Resource
+# TrueWatch Synthetics Test Resource
 
 ## 核心功能
 
-Guance Synthetics Test 资源用于在 Guance Cloud 中创建和管理云拨测任务。云拨测是一种主动监控服务，可以定期从全球多个地域向指定的目标（如网站、API、TCP 服务等）发起测试，以检测其可用性和性能。
+TrueWatch Synthetics Test 资源用于在 TrueWatch Cloud 中创建和管理云拨测任务。云拨测是一种主动监控服务，可以定期从全球多个地域向指定的目标（如网站、API、TCP 服务等）发起测试，以检测其可用性和性能。
 
 ## 适用场景
 
@@ -81,9 +81,9 @@ Guance Synthetics Test 资源用于在 Guance Cloud 中创建和管理云拨测�
 ### 创建资源
 
 ```hcl
-resource "guance_synthetics_test" "example" {
+resource "truewatch_synthetics_test" "example" {
   type    = "http"
-  regions = ["hangzhou", "shanghai"]
+  regions = ["singapore", "shanghai"]
   tags    = ["test", "http"]
 
   task {
@@ -116,10 +116,10 @@ resource "guance_synthetics_test" "example" {
 API 调用示例：
 
 ```shell
-curl 'https://openapi.guance.com/api/v1/dialing_task/add' \
+curl 'https://openapi.truewatch.com/api/v1/dialing_task/add' \
 -H 'DF-API-KEY: <DF-API-KEY>' \
 -H 'Content-Type: application/json;charset=UTF-8' \
---data-raw '{"type":"http","regions":["hangzhou","shanghai"],"task":{"name":"HTTP Test","url":"https://www.example.com","method":"GET","frequency":"1m","status":"ok","advance_options":{"request_options":{"follow_redirect":true,"headers":{"User-Agent":"Mozilla/5.0"}}},"success_when_logic":"and","success_when":[{"status_code":[{"is":"200"}],"response_time":"500ms"}]},"tags":["test","http"]}'
+--data-raw '{"type":"http","regions":["singapore","shanghai"],"task":{"name":"HTTP Test","url":"https://www.example.com","method":"GET","frequency":"1m","status":"ok","advance_options":{"request_options":{"follow_redirect":true,"headers":{"User-Agent":"Mozilla/5.0"}}},"success_when_logic":"and","success_when":[{"status_code":[{"is":"200"}],"response_time":"500ms"}]},"tags":["test","http"]}'
 ```
 
 ### 更新资源
@@ -133,10 +133,10 @@ terraform apply
 API 调用示例：
 
 ```shell
-curl 'https://openapi.guance.com/api/v1/dialing_task/<task_uuid>/modify' \
+curl 'https://openapi.truewatch.com/api/v1/dialing_task/<task_uuid>/modify' \
 -H 'DF-API-KEY: <DF-API-KEY>' \
 -H 'Content-Type: application/json;charset=UTF-8' \
---data-raw '{"regions":["hangzhou","shanghai"],"task":{"name":"HTTP Test Updated","url":"https://www.example.com","method":"GET","frequency":"5m","status":"ok","advance_options":{"request_options":{"follow_redirect":true,"headers":{"User-Agent":"Mozilla/5.0"}}},"success_when_logic":"and","success_when":[{"status_code":[{"is":"200"}],"response_time":"500ms"}]},"tags":["test","http","updated"]}'
+--data-raw '{"regions":["singapore","shanghai"],"task":{"name":"HTTP Test Updated","url":"https://www.example.com","method":"GET","frequency":"5m","status":"ok","advance_options":{"request_options":{"follow_redirect":true,"headers":{"User-Agent":"Mozilla/5.0"}}},"success_when_logic":"and","success_when":[{"status_code":[{"is":"200"}],"response_time":"500ms"}]},"tags":["test","http","updated"]}'
 ```
 
 ### 删除资源
@@ -144,13 +144,13 @@ curl 'https://openapi.guance.com/api/v1/dialing_task/<task_uuid>/modify' \
 执行以下命令删除资源：
 
 ```bash
-terraform destroy -target=guance_synthetics_test.example
+terraform destroy -target=truewatch_synthetics_test.example
 ```
 
 API 调用示例：
 
 ```shell
-curl 'https://openapi.guance.com/api/v1/dialing_task/delete' \
+curl 'https://openapi.truewatch.com/api/v1/dialing_task/delete' \
 -H 'DF-API-KEY: <DF-API-KEY>' \
 -H 'Content-Type: application/json;charset=UTF-8' \
 --data-raw '{"taskUUIDs":["<task_uuid>"]}'
@@ -170,7 +170,7 @@ curl 'https://openapi.guance.com/api/v1/dialing_task/delete' \
 
 3. **地域不存在**
    - 问题：指定的地域不存在或不可用
-   - 解决方案：使用有效的地域名称，可参考 Guance Cloud 文档中的地域列表
+   - 解决方案：使用有效的地域名称，可参考 TrueWatch Cloud 文档中的地域列表
 
 ### 资源更新失败
 
@@ -197,9 +197,9 @@ curl 'https://openapi.guance.com/api/v1/dialing_task/delete' \
 ### HTTP 测试示例
 
 ```hcl
-resource "guance_synthetics_test" "http_test" {
+resource "truewatch_synthetics_test" "http_test" {
   type    = "http"
-  regions = ["hangzhou", "shanghai"]
+  regions = ["singapore", "shanghai"]
   tags    = ["http", "production"]
 
   task {
@@ -239,9 +239,9 @@ resource "guance_synthetics_test" "http_test" {
 ### TCP 测试示例
 
 ```hcl
-resource "guance_synthetics_test" "tcp_test" {
+resource "truewatch_synthetics_test" "tcp_test" {
   type    = "tcp"
-  regions = ["hangzhou", "shanghai"]
+  regions = ["singapore", "shanghai"]
   tags    = ["tcp", "production"]
 
   task {
@@ -263,9 +263,9 @@ resource "guance_synthetics_test" "tcp_test" {
 ### WebSocket 测试示例
 
 ```hcl
-resource "guance_synthetics_test" "websocket_test" {
+resource "truewatch_synthetics_test" "websocket_test" {
   type    = "websocket"
-  regions = ["hangzhou", "shanghai"]
+  regions = ["singapore", "shanghai"]
   tags    = ["websocket", "production"]
 
   task {

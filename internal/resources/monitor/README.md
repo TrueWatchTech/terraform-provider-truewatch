@@ -1,11 +1,11 @@
 # Monitor Resource
 
-The `guance_monitor` resource manages monitor checker rules in Guance Cloud.
+The `truewatch_monitor` resource manages monitor checker rules in TrueWatch Cloud.
 
 ## Example Usage
 
 ```terraform
-resource "guance_monitor" "example" {
+resource "truewatch_monitor" "example" {
   type                = "trigger"
   status              = 0
   tags                = ["example", "terraform"]

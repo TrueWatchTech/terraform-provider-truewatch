@@ -5,7 +5,7 @@ import (
 
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/provider"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/provider"
 )
 
 func TestAccMute(t *testing.T) {
@@ -15,7 +15,7 @@ func TestAccMute(t *testing.T) {
 			// Create and Read testing
 			{
 				Config: provider.Config + `
-resource "guance_notify_object" "demo" {
+resource "truewatch_notify_object" "demo" {
   type = "simpleHTTPRequest"
   name = "oac-mute-notify-demo"
 
@@ -28,7 +28,7 @@ resource "guance_notify_object" "demo" {
   })
 }
 
-resource "guance_alert_policy" "demo" {
+resource "truewatch_alert_policy" "demo" {
   name          = "oac-mute-alert-policy-demo"
   desc          = "acceptance mute alert policy"
   rule_timezone = "Asia/Shanghai"
@@ -42,14 +42,14 @@ resource "guance_alert_policy" "demo" {
       name = "default"
 
       targets = [{
-        to     = [guance_notify_object.demo.uuid]
+        to     = [truewatch_notify_object.demo.uuid]
         status = "critical,error,warning"
       }]
     }]
   }
 }
 
-resource "guance_mute" "demo" {
+resource "truewatch_mute" "demo" {
   name        = "oac-mute-demo"
   description = "acceptance alert policy mute"
   type        = "alertPolicy"
@@ -57,8 +57,8 @@ resource "guance_mute" "demo" {
   enabled     = false
 
   mute_ranges = [{
-    name              = guance_alert_policy.demo.name
-    alert_policy_uuid = guance_alert_policy.demo.uuid
+    name              = truewatch_alert_policy.demo.name
+    alert_policy_uuid = truewatch_alert_policy.demo.uuid
   }]
 
   repeat_time_set = 0
@@ -70,15 +70,15 @@ resource "guance_mute" "demo" {
 
   notify_targets = [{
     type = "notifyObject"
-    to   = [guance_notify_object.demo.uuid]
+    to   = [truewatch_notify_object.demo.uuid]
   }]
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("guance_mute.demo", "name", "oac-mute-demo"),
-					resource.TestCheckResourceAttr("guance_mute.demo", "type", "alertPolicy"),
-					resource.TestCheckResourceAttr("guance_mute.demo", "enabled", "false"),
-					resource.TestCheckResourceAttr("guance_mute.demo", "status", "2"),
+					resource.TestCheckResourceAttr("truewatch_mute.demo", "name", "oac-mute-demo"),
+					resource.TestCheckResourceAttr("truewatch_mute.demo", "type", "alertPolicy"),
+					resource.TestCheckResourceAttr("truewatch_mute.demo", "enabled", "false"),
+					resource.TestCheckResourceAttr("truewatch_mute.demo", "status", "2"),
 				),
 			},
 
@@ -93,7 +93,7 @@ func TestAccMuteRepeatedAndCustom(t *testing.T) {
 		Steps: []resource.TestStep{
 			{
 				Config: provider.Config + `
-resource "guance_notify_object" "demo" {
+resource "truewatch_notify_object" "demo" {
   type = "simpleHTTPRequest"
   name = "oac-mute-scenarios-notify-demo"
 
@@ -106,7 +106,7 @@ resource "guance_notify_object" "demo" {
   })
 }
 
-resource "guance_alert_policy" "demo" {
+resource "truewatch_alert_policy" "demo" {
   name          = "oac-mute-scenarios-alert-policy-demo"
   desc          = "acceptance mute scenarios alert policy"
   rule_timezone = "Asia/Shanghai"
@@ -120,22 +120,22 @@ resource "guance_alert_policy" "demo" {
       name = "default"
 
       targets = [{
-        to     = [guance_notify_object.demo.uuid]
+        to     = [truewatch_notify_object.demo.uuid]
         status = "critical,error,warning"
       }]
     }]
   }
 }
 
-resource "guance_mute" "weekly" {
+resource "truewatch_mute" "weekly" {
   name        = "oac-mute-weekly-demo"
   description = "acceptance repeated alert policy mute"
   type        = "alertPolicy"
   timezone    = "Asia/Shanghai"
 
   mute_ranges = [{
-    name              = guance_alert_policy.demo.name
-    alert_policy_uuid = guance_alert_policy.demo.uuid
+    name              = truewatch_alert_policy.demo.name
+    alert_policy_uuid = truewatch_alert_policy.demo.uuid
   }]
 
   repeat_time_set = 1
@@ -154,7 +154,7 @@ resource "guance_mute" "weekly" {
   }
 }
 
-resource "guance_mute" "custom" {
+resource "truewatch_mute" "custom" {
   name        = "oac-mute-custom-demo"
   description = "acceptance custom mute"
   type        = "custom"
@@ -174,13 +174,13 @@ resource "guance_mute" "custom" {
 }
 `,
 				Check: resource.ComposeAggregateTestCheckFunc(
-					resource.TestCheckResourceAttr("guance_mute.weekly", "repeat_time_set", "1"),
-					resource.TestCheckResourceAttr("guance_mute.weekly", "repeat_crontab_set.hour", "0"),
-					resource.TestCheckResourceAttr("guance_mute.weekly", "crontab_duration", "3600"),
-					resource.TestCheckResourceAttr("guance_mute.custom", "type", "custom"),
-					resource.TestCheckResourceAttr("guance_mute.custom", "enabled", "false"),
-					resource.TestCheckResourceAttr("guance_mute.custom", "status", "2"),
-					resource.TestCheckResourceAttr("guance_mute.custom", "filter_string", "host:oac-mute-custom service:terraform"),
+					resource.TestCheckResourceAttr("truewatch_mute.weekly", "repeat_time_set", "1"),
+					resource.TestCheckResourceAttr("truewatch_mute.weekly", "repeat_crontab_set.hour", "0"),
+					resource.TestCheckResourceAttr("truewatch_mute.weekly", "crontab_duration", "3600"),
+					resource.TestCheckResourceAttr("truewatch_mute.custom", "type", "custom"),
+					resource.TestCheckResourceAttr("truewatch_mute.custom", "enabled", "false"),
+					resource.TestCheckResourceAttr("truewatch_mute.custom", "status", "2"),
+					resource.TestCheckResourceAttr("truewatch_mute.custom", "filter_string", "host:oac-mute-custom service:terraform"),
 				),
 			},
 		},

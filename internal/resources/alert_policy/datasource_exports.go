@@ -1,6 +1,6 @@
 package alert_policy
 
-import "github.com/GuanceCloud/terraform-provider-guance/internal/api"
+import "github.com/TrueWatchTech/terraform-provider-truewatch/internal/api"
 
 type AlertOptModel = alertOptModel
 

@@ -1,14 +1,14 @@
 # Monitor Example
 
-This example demonstrates how to create a Guance monitor/checker with the `guance_monitor` resource.
+This example demonstrates how to create a TrueWatch monitor/checker with the `truewatch_monitor` resource.
 
-Use `guance_monitor` when you want Terraform to manage the checker through structured fields such as `json_script`, `status`, `tags`, alert policy bindings, and operation permissions. Use `guance_monitor_json` instead when you want to manage an exported checker JSON document directly.
+Use `truewatch_monitor` when you want Terraform to manage the checker through structured fields such as `json_script`, `status`, `tags`, alert policy bindings, and operation permissions. Use `truewatch_monitor_json` instead when you want to manage an exported checker JSON document directly.
 
 ## Prerequisites
 
 1. Terraform 1.0+ installed.
-2. Guance Cloud account with OpenAPI access.
-3. `GUANCE_ACCESS_TOKEN` configured in your environment, or `access_token` configured in `provider.tf`.
+2. TrueWatch Cloud account with OpenAPI access.
+3. `TRUEWATCH_ACCESS_TOKEN` configured in your environment, or `access_token` configured in `provider.tf`.
 
 ## Usage
 

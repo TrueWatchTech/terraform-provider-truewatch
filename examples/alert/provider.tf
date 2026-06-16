@@ -3,12 +3,12 @@ terraform {
 
   required_providers {
     guance = {
-      source = "GuanceCloud/guance"
+      source = "TrueWatchTech/truewatch"
     }
   }
 }
 
 provider "guance" {
-  # You can set your API key here or use the GUANCE_ACCESS_TOKEN environment variable.
+  # You can set your API key here or use the TRUEWATCH_ACCESS_TOKEN environment variable.
   # access_token = "your-api-key"
 }

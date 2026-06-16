@@ -2,13 +2,13 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    guance = {
-      source = "GuanceCloud/guance"
+    truewatch = {
+      source = "TrueWatchTech/truewatch"
     }
   }
 }
 
-provider "guance" {
-  # You can set your API key here or use the GUANCE_ACCESS_TOKEN environment variable
+provider "truewatch" {
+  # You can set your API key here or use the TRUEWATCH_ACCESS_TOKEN environment variable
   # access_token = "your-api-key"
 }

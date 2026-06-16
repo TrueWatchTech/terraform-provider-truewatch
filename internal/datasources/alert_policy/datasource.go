@@ -10,10 +10,10 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/api"
-	"github.com/GuanceCloud/terraform-provider-guance/internal/consts"
-	"github.com/GuanceCloud/terraform-provider-guance/internal/helpers/tfconvert"
-	resourcealert "github.com/GuanceCloud/terraform-provider-guance/internal/resources/alert_policy"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/api"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/consts"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/helpers/tfconvert"
+	resourcealert "github.com/TrueWatchTech/terraform-provider-truewatch/internal/resources/alert_policy"
 )
 
 var (
@@ -53,7 +53,7 @@ func (d *alertPolicyDataSource) Metadata(_ context.Context, req datasource.Metad
 func (d *alertPolicyDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = dsschema.Schema{
 		Description:         "Lookup an alert policy by UUID or exact name.",
-		MarkdownDescription: "The `guance_alert_policy` data source reads an existing Guance alert policy by `uuid` or exact `name`.",
+		MarkdownDescription: "The `truewatch_alert_policy` data source reads an existing TrueWatch alert policy by `uuid` or exact `name`.",
 		Attributes: map[string]dsschema.Attribute{
 			"uuid": dsschema.StringAttribute{
 				Description: "The UUID of the alert policy.",

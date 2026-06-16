@@ -10,9 +10,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/api"
-	"github.com/GuanceCloud/terraform-provider-guance/internal/consts"
-	"github.com/GuanceCloud/terraform-provider-guance/internal/helpers/tfconvert"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/api"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/consts"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/helpers/tfconvert"
 )
 
 var (
@@ -36,7 +36,7 @@ func (d *monitorDataSource) Metadata(_ context.Context, req datasource.MetadataR
 func (d *monitorDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = dsschema.Schema{
 		Description:         "Lookup a monitor by UUID or exact name.",
-		MarkdownDescription: "The `guance_monitor` data source reads an existing Guance monitor/checker by `uuid` or exact `name`.",
+		MarkdownDescription: "The `truewatch_monitor` data source reads an existing TrueWatch monitor/checker by `uuid` or exact `name`.",
 		Attributes: map[string]dsschema.Attribute{
 			"uuid": dsschema.StringAttribute{
 				Description: "The UUID of the monitor/checker.",

@@ -5,7 +5,7 @@ set -euo pipefail
 echo "Active terraform: $(terraform version 2>/dev/null | head -1 || echo 'not found on PATH')"
 
 go run github.com/hashicorp/terraform-plugin-docs/cmd/tfplugindocs generate \
-  --provider-name guance \
+  --provider-name truewatch \
   --examples-dir examples
 
 find docs -name '*.md' -print0 | xargs -0 perl -pi -e 's/[ \t]+$//'

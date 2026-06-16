@@ -2,17 +2,17 @@
 
 This example creates a complete alert delivery chain:
 
-- `guance_notify_object` for a webhook notification target
-- `guance_alert_policy_notice_date` for a reusable custom notice date calendar
-- `guance_alert_policy` for status-based alert routing
-- `guance_mute` for a one-time maintenance mute
+- `truewatch_notify_object` for a webhook notification target
+- `truewatch_alert_policy_notice_date` for a reusable custom notice date calendar
+- `truewatch_alert_policy` for status-based alert routing
+- `truewatch_mute` for a one-time maintenance mute
 - Matching data sources to read the created resources back by exact name
 
 ## Prerequisites
 
 1. Terraform 1.0+ installed
-2. Guance Cloud account with API access
-3. `GUANCE_ACCESS_TOKEN` configured in your environment, or `access_token` configured in `provider.tf`
+2. TrueWatch Cloud account with API access
+3. `TRUEWATCH_ACCESS_TOKEN` configured in your environment, or `access_token` configured in `provider.tf`
 
 ## Usage
 

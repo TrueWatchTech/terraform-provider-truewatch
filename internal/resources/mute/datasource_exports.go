@@ -3,7 +3,7 @@ package mute
 import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/api"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/api"
 )
 
 type MuteRange = muteRange

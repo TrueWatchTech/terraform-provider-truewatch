@@ -7,8 +7,8 @@ import (
 	dsschema "github.com/hashicorp/terraform-plugin-framework/datasource/schema"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/api"
-	"github.com/GuanceCloud/terraform-provider-guance/internal/helpers/tfconvert"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/api"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/helpers/tfconvert"
 )
 
 var (
@@ -31,7 +31,7 @@ func (d *monitorsDataSource) Metadata(_ context.Context, req datasource.Metadata
 func (d *monitorsDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = dsschema.Schema{
 		Description:         "List monitors by search and optional filters.",
-		MarkdownDescription: "The `guance_monitors` data source lists Guance monitors/checkers by search and optional filters.",
+		MarkdownDescription: "The `truewatch_monitors` data source lists TrueWatch monitors/checkers by search and optional filters.",
 		Attributes: map[string]dsschema.Attribute{
 			"search": dsschema.StringAttribute{
 				Description: "Monitor search keyword.",

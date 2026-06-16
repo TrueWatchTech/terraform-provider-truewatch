@@ -1,10 +1,10 @@
-# Terraform Provider: Guance
+# Terraform Provider: TrueWatch
 
-The Guance Provider provides resources to manage [Guance Cloud](https://en.guance.com/) resources.
+The TrueWatch Provider provides resources to manage [TrueWatch Cloud](https://en.truewatch.com/) resources.
 
 ## Documentation, questions, and discussions
 
-Official documentation on how to use this provider can be found on the [Terraform Registry](https://registry.terraform.io/providers/GuanceCloud/guance/latest/docs).
+Official documentation on how to use this provider can be found on the [Terraform Registry](https://registry.terraform.io/providers/TrueWatchTech/truewatch/latest/docs).
 
 The remainder of this document will focus on the development aspects of the provider.
 
@@ -12,30 +12,30 @@ The resource supports as follows:
 
 | Resource | Description |
 | --- | --- |
-| `guance_alert_policy` | Alert routing policy, notification targets, aggregation, silence, escalation, permissions, and checker/security rule bindings. |
-| `guance_alert_policy_notice_date` | Custom alert policy notification date windows. |
-| `guance_blacklist` | Blacklist configuration. |
-| `guance_dashboard` | Dashboard configuration. |
-| `guance_membergroup` | Workspace member groups. |
-| `guance_monitor` | Monitor/checker rules managed with structured Terraform fields. |
-| `guance_monitor_json` | Monitor/checker rules managed with raw JSON payloads. |
-| `guance_mute` | Alert, checker, tag, and custom mute rules. |
-| `guance_notify_object` | Alert notification objects and notification permissions. |
-| `guance_pipeline` | Pipeline configuration. |
-| `guance_role` | Workspace roles. |
+| `truewatch_alert_policy` | Alert routing policy, notification targets, aggregation, silence, escalation, permissions, and checker/security rule bindings. |
+| `truewatch_alert_policy_notice_date` | Custom alert policy notification date windows. |
+| `truewatch_blacklist` | Blacklist configuration. |
+| `truewatch_dashboard` | Dashboard configuration. |
+| `truewatch_membergroup` | Workspace member groups. |
+| `truewatch_monitor` | Monitor/checker rules managed with structured Terraform fields. |
+| `truewatch_monitor_json` | Monitor/checker rules managed with raw JSON payloads. |
+| `truewatch_mute` | Alert, checker, tag, and custom mute rules. |
+| `truewatch_notify_object` | Alert notification objects and notification permissions. |
+| `truewatch_pipeline` | Pipeline configuration. |
+| `truewatch_role` | Workspace roles. |
 
 The data source supports as follows:
 
 | Data Source | Description |
 | --- | --- |
-| `guance_alert_policy` | Look up an alert policy by UUID or exact name. |
-| `guance_alert_policy_notice_date` | Look up a custom alert policy notification date by UUID or exact name. |
-| `guance_members` | List workspace members. |
-| `guance_monitor` | Look up a monitor/checker by UUID or exact name. |
-| `guance_monitors` | List monitor/checker rules with filters. |
-| `guance_mute` | Look up a mute rule by UUID or exact name. |
-| `guance_notify_object` | Look up a notification object by UUID or exact name. |
-| `guance_permissions` | List workspace permissions. |
+| `truewatch_alert_policy` | Look up an alert policy by UUID or exact name. |
+| `truewatch_alert_policy_notice_date` | Look up a custom alert policy notification date by UUID or exact name. |
+| `truewatch_members` | List workspace members. |
+| `truewatch_monitor` | Look up a monitor/checker by UUID or exact name. |
+| `truewatch_monitors` | List monitor/checker rules with filters. |
+| `truewatch_mute` | Look up a mute rule by UUID or exact name. |
+| `truewatch_notify_object` | Look up a notification object by UUID or exact name. |
+| `truewatch_permissions` | List workspace permissions. |
 
 The region supports as follows:
 
@@ -48,20 +48,20 @@ The region supports as follows:
 * [x] frankfurt
 * [x] singapore
 
-If there are more resources you need, create an [issue](https://github.com/GuanceCloud/terraform-provider-guance/issues) for free.
+If there are more resources you need, create an [issue](https://github.com/TrueWatchTech/terraform-provider-truewatch/issues) for free.
 
 ## Compatibility
 
 Compatibility table between this provider, the [Terraform Plugin Protocol](https://www.terraform.io/plugin/how-terraform-works#terraform-plugin-protocol)
 version it implements, and Terraform:
 
-| Guance Provider | Terraform Plugin Protocol | Terraform |
+| TrueWatch Provider | Terraform Plugin Protocol | Terraform |
 |:---------------:|:-------------------------:|:---------:|
 |    `>= 0.x`     |            `6`            | `>= 1.0`  |
 
 Details can be found by querying the [Registry API](https://www.terraform.io/internals/provider-registry-protocol#list-available-versions)
 that return all the details about which versions are currently available for a particular provider.
-[Here](https://registry.terraform.io/v1/providers/GuanceCloud/guance/versions) are the details.
+[Here](https://registry.terraform.io/v1/providers/TrueWatchTech/truewatch/versions) are the details.
 
 ## Requirements
 
@@ -103,7 +103,7 @@ Run the unit test suite with:
 make test
 ```
 
-Run acceptance tests against a configured Guance environment with:
+Run acceptance tests against a configured TrueWatch environment with:
 
 ```shell
 make testacc

@@ -10,9 +10,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 
-	"github.com/GuanceCloud/terraform-provider-guance/internal/api"
-	"github.com/GuanceCloud/terraform-provider-guance/internal/consts"
-	"github.com/GuanceCloud/terraform-provider-guance/internal/helpers/tfconvert"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/api"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/consts"
+	"github.com/TrueWatchTech/terraform-provider-truewatch/internal/helpers/tfconvert"
 )
 
 var (
@@ -45,7 +45,7 @@ func (d *alertPolicyNoticeDateDataSource) Metadata(_ context.Context, req dataso
 func (d *alertPolicyNoticeDateDataSource) Schema(_ context.Context, _ datasource.SchemaRequest, resp *datasource.SchemaResponse) {
 	resp.Schema = dsschema.Schema{
 		Description:         "Lookup an alert policy custom notice date by UUID or exact name.",
-		MarkdownDescription: "The `guance_alert_policy_notice_date` data source reads an existing custom notice date by `uuid` or exact `name`.",
+		MarkdownDescription: "The `truewatch_alert_policy_notice_date` data source reads an existing custom notice date by `uuid` or exact `name`.",
 		Attributes: map[string]dsschema.Attribute{
 			"uuid": dsschema.StringAttribute{
 				Description: "The UUID of the notice date.",

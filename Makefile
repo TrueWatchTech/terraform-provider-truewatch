@@ -4,7 +4,7 @@ generate:
 	go generate ./...
 
 docs:
-	./scripts/generate-docs.sh
+	bash scripts/generate-docs.sh
 
 check-docs: docs
 	@if [ "`git status --porcelain docs/`" ]; then \

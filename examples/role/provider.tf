@@ -3,12 +3,12 @@ terraform {
   required_version = ">= 1.0"
 
   required_providers {
-    guance = {
-      source = "GuanceCloud/guance"
+    truewatch = {
+      source = "TrueWatchTech/truewatch"
     }
   }
 }
 
-provider "guance" {
-  region = "hangzhou"
+provider "truewatch" {
+  region = "singapore"
 }
