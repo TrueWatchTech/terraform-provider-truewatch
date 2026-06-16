@@ -20,7 +20,7 @@ resource "truewatch_notify_object" "demo" {
   name = "oac-mute-notify-demo"
 
   opt_set = jsonencode({
-    url = "https://example.com/terraform-provider-guance-mute-test"
+    url = "https://example.com/terraform-provider-truewatch-mute-test"
     headersConfig = {
       isOpen = false
       items  = []
@@ -98,7 +98,7 @@ resource "truewatch_notify_object" "demo" {
   name = "oac-mute-scenarios-notify-demo"
 
   opt_set = jsonencode({
-    url = "https://example.com/terraform-provider-guance-mute-scenarios-test"
+    url = "https://example.com/terraform-provider-truewatch-mute-scenarios-test"
     headersConfig = {
       isOpen = false
       items  = []
@@ -169,7 +169,7 @@ resource "truewatch_mute" "custom" {
   filter_string   = "host:oac-mute-custom service:terraform"
 
   declaration = {
-    source = "terraform-provider-guance"
+    source = "terraform-provider-truewatch"
   }
 }
 `,

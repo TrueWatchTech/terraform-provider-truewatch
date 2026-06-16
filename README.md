@@ -39,14 +39,11 @@ The data source supports as follows:
 
 The region supports as follows:
 
-* [x] hangzhou
-* [x] ningxia
-* [x] guangzhou
-* [x] vnet
-* [x] hongkong
 * [x] oregon
 * [x] frankfurt
 * [x] singapore
+* [x] southafrica
+* [x] jakarta
 
 If there are more resources you need, create an [issue](https://github.com/TrueWatchTech/terraform-provider-truewatch/issues) for free.
 

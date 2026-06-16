@@ -32,5 +32,4 @@ terraform apply \
   -var='name_prefix=my-alert-example'
 ```
 
-The default notification object uses `simpleHTTPRequest` and posts to `https://example.com/guance-alert-example`. Replace `var.webhook_url` with a real endpoint before using this as a production alert route.
-
+The default notification object uses `simpleHTTPRequest` and posts to `https://example.com/truewatch-alert-example`. Replace `var.webhook_url` with a real endpoint before using this as a production alert route.

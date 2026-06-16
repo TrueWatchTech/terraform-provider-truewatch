@@ -13,7 +13,7 @@ variable "timezone" {
 variable "webhook_url" {
   description = "Webhook URL used by the simple HTTP request notify object."
   type        = string
-  default     = "https://example.com/guance-alert-example"
+  default     = "https://example.com/truewatch-alert-example"
 }
 
 variable "notice_dates" {

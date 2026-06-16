@@ -20,7 +20,7 @@ resource "truewatch_notify_object" "demo" {
   name = "oac-alert-policy-demo"
 
   opt_set = jsonencode({
-    url = "https://example.com/terraform-provider-guance-alert-policy-test"
+    url = "https://example.com/terraform-provider-truewatch-alert-policy-test"
     headersConfig = {
       isOpen = false
       items  = []
@@ -85,7 +85,7 @@ resource "truewatch_notify_object" "demo" {
   name = "oac-alert-policy-complex-demo"
 
   opt_set = jsonencode({
-    url = "https://example.com/terraform-provider-guance-alert-policy-complex-test"
+    url = "https://example.com/terraform-provider-truewatch-alert-policy-complex-test"
     headersConfig = {
       isOpen = false
       items  = []
@@ -178,7 +178,7 @@ resource "truewatch_notify_object" "demo" {
   name = "oac-alert-policy-member-demo"
 
   opt_set = jsonencode({
-    url = "https://example.com/terraform-provider-guance-alert-policy-member-test"
+    url = "https://example.com/terraform-provider-truewatch-alert-policy-member-test"
     headersConfig = {
       isOpen = false
       items  = []

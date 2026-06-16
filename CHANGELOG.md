@@ -44,4 +44,4 @@
 * [truewatch_alert_policy] Clearing a security target `df_source` depends on a pending Forethought OpenAPI contract clarification.
 * [truewatch_mute] The OpenAPI currently requires non-empty `startTime` and `endTime` values for mute requests.
 
-**Full Changelog**: https://github.com/TrueWatchTech/terraform-provider-truewatch/compare/v0.0.9...v0.1.0
+**Full Changelog**: https://github.com/TrueWatchTech/terraform-provider-truewatch/compare/v0.0.2...v0.1.0
