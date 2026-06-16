@@ -3,8 +3,6 @@ package notify_object
 import (
 	"context"
 	_ "embed"
-	"encoding/json"
-	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -12,7 +10,7 @@ import (
 
 	"github.com/GuanceCloud/terraform-provider-guance/internal/api"
 	"github.com/GuanceCloud/terraform-provider-guance/internal/consts"
-	"github.com/hashicorp/terraform-plugin-log/tflog"
+	"github.com/GuanceCloud/terraform-provider-guance/internal/helpers/tfconvert"
 )
 
 //go:embed README.md
@@ -63,11 +61,17 @@ func (r *notifyObjectResource) Create(ctx context.Context, req resource.CreateRe
 		return
 	}
 
-	item := r.getNotifyObjectFromPlan(&plan)
-	rb, _ := json.Marshal(item)
-	tflog.Debug(ctx, fmt.Sprintf("============= body: %s", string(rb)))
+	item, err := r.getNotifyObjectFromPlan(&plan)
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("opt_set"),
+			"Invalid opt_set JSON",
+			"opt_set must be a valid JSON object string: "+err.Error(),
+		)
+		return
+	}
 	content := &api.NotifyObjectContent{}
-	err := r.client.Create(consts.TypeNameNotifyObject, item, content)
+	err = r.client.Create(consts.TypeNameNotifyObject, item, content)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating notify object",
@@ -116,16 +120,19 @@ func (r *notifyObjectResource) Read(ctx context.Context, req resource.ReadReques
 	state.Type = types.StringValue(content.Type)
 	state.Name = types.StringValue(content.Name)
 	if content.OptSet != nil {
-		optSetBytes, _ := json.Marshal(content.OptSet)
-		state.OptSet = types.StringValue(string(optSetBytes))
+		optSet, err := tfconvert.CanonicalJSONFromValue(content.OptSet)
+		if err != nil {
+			resp.Diagnostics.AddError(
+				"Error reading notify object opt_set",
+				"Could not encode notify object opt_set, unexpected error: "+err.Error(),
+			)
+			return
+		}
+		state.OptSet = types.StringValue(optSet)
 	}
 	state.OpenPermissionSet = types.BoolValue(content.OpenPermissionSet)
-	if len(content.PermissionSet) > 0 {
-		permissionSet := make([]types.String, len(content.PermissionSet))
-		for i, perm := range content.PermissionSet {
-			permissionSet[i] = types.StringValue(perm)
-		}
-		state.PermissionSet = permissionSet
+	if content.PermissionSet != nil {
+		state.PermissionSet = permissionSetFromContent(content.PermissionSet, state.PermissionSet)
 	}
 	state.CreateAt = types.Int64Value(int64(content.CreateAt))
 	state.UpdateAt = types.Int64Value(int64(content.UpdateAt))
@@ -149,18 +156,17 @@ func (r *notifyObjectResource) Update(ctx context.Context, req resource.UpdateRe
 		return
 	}
 
-	item := r.getNotifyObjectFromPlan(&plan)
-	// For notify object, the UUID is in the body, not the path
-	itemWithUUID := map[string]interface{}{
-		"notifyObjectUUID":  plan.UUID.ValueString(),
-		"name":              item.Name,
-		"optSet":            item.OptSet,
-		"openPermissionSet": item.OpenPermissionSet,
-		"permissionSet":     item.PermissionSet,
+	item, err := r.getNotifyObjectFromPlan(&plan)
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("opt_set"),
+			"Invalid opt_set JSON",
+			"opt_set must be a valid JSON object string: "+err.Error(),
+		)
+		return
 	}
-
 	content := &api.NotifyObjectContent{}
-	err := r.client.UpdateNotifyObject(itemWithUUID, content)
+	err = r.client.UpdateNotifyObject(notifyObjectUpdateBody(plan.UUID.ValueString(), item), content)
 
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -204,7 +210,7 @@ func (r *notifyObjectResource) ImportState(ctx context.Context, req resource.Imp
 	resource.ImportStatePassthroughID(ctx, path.Root("uuid"), req, resp)
 }
 
-func (r *notifyObjectResource) getNotifyObjectFromPlan(plan *notifyObjectResourceModel) *api.NotifyObject {
+func (r *notifyObjectResource) getNotifyObjectFromPlan(plan *notifyObjectResourceModel) (*api.NotifyObject, error) {
 
 	n := &api.NotifyObject{
 		Type: plan.Type.ValueString(),
@@ -212,10 +218,12 @@ func (r *notifyObjectResource) getNotifyObjectFromPlan(plan *notifyObjectResourc
 	}
 
 	if !plan.OptSet.IsNull() {
-		var optSet interface{}
-		if err := json.Unmarshal([]byte(plan.OptSet.ValueString()), &optSet); err == nil {
-			n.OptSet = optSet
+		optSet, canonicalOptSet, err := tfconvert.CanonicalJSONFromString(plan.OptSet.ValueString())
+		if err != nil {
+			return nil, err
 		}
+		n.OptSet = optSet
+		plan.OptSet = types.StringValue(canonicalOptSet)
 	}
 
 	if !plan.OpenPermissionSet.IsNull() {
@@ -230,5 +238,33 @@ func (r *notifyObjectResource) getNotifyObjectFromPlan(plan *notifyObjectResourc
 		n.PermissionSet = permissionSet
 	}
 
-	return n
+	return n, nil
+}
+
+func notifyObjectUpdateBody(uuid string, item *api.NotifyObject) map[string]any {
+	return map[string]any{
+		"notifyObjectUUID":  uuid,
+		"name":              item.Name,
+		"optSet":            item.OptSet,
+		"openPermissionSet": item.OpenPermissionSet,
+		"permissionSet":     emptyStringSliceIfNil(item.PermissionSet),
+	}
+}
+
+func emptyStringSliceIfNil(values []string) []string {
+	if values == nil {
+		return []string{}
+	}
+	return values
+}
+
+func permissionSetFromContent(values []string, existing []types.String) []types.String {
+	if len(values) == 0 && len(existing) == 0 {
+		return existing
+	}
+	result := make([]types.String, len(values))
+	for i, value := range values {
+		result[i] = types.StringValue(value)
+	}
+	return result
 }

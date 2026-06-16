@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"encoding/json"
 	"fmt"
+	"reflect"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
 	"github.com/hashicorp/terraform-plugin-framework/resource"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/GuanceCloud/terraform-provider-guance/internal/api"
 	"github.com/GuanceCloud/terraform-provider-guance/internal/consts"
+	"github.com/GuanceCloud/terraform-provider-guance/internal/helpers/tfconvert"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
 )
 
@@ -63,11 +65,19 @@ func (r *monitorResource) Create(ctx context.Context, req resource.CreateRequest
 		return
 	}
 
-	item := r.getMonitorFromPlan(&plan)
+	item, err := r.getMonitorFromPlan(&plan)
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("extend"),
+			"Invalid extend JSON",
+			"extend must be a valid JSON object string: "+err.Error(),
+		)
+		return
+	}
 	rb, _ := json.Marshal(item)
 	tflog.Debug(ctx, fmt.Sprintf("============= body: %s", string(rb)))
 	content := &api.MonitorContent{}
-	err := r.client.Create(consts.TypeNameMonitor, item, content)
+	err = r.client.Create(consts.TypeNameMonitor, item, content)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error creating monitor",
@@ -117,11 +127,30 @@ func (r *monitorResource) Read(ctx context.Context, req resource.ReadRequest, re
 	state.UUID = types.StringValue(content.UUID)
 	state.Type = types.StringValue(content.Type)
 	state.Status = types.Int64Value(int64(content.Status))
+	state.OpenPermissionSet = types.BoolValue(content.OpenPermissionSet)
 	state.MonitorUUID = types.StringValue(content.MonitorUUID)
 	state.MonitorName = types.StringValue(content.MonitorName)
 	state.WorkspaceUUID = types.StringValue(content.WorkspaceUUID)
 	state.CreateAt = types.Int64Value(int64(content.CreateAt))
 	state.UpdateAt = types.Int64Value(int64(content.UpdateAt))
+	if err := applyExtendFromContent(&state, content.Extend); err != nil {
+		resp.Diagnostics.AddError(
+			"Error reading monitor",
+			"Could not decode monitor extend, unexpected error: "+err.Error(),
+		)
+		return
+	}
+	if content.AlertPolicyUUIDs != nil {
+		state.AlertPolicyUUIDs = stringsFromContent(content.AlertPolicyUUIDs)
+	}
+	state.DashboardUUID = optionalStringFromContent(content.DashboardUUID)
+	if content.Tags != nil {
+		state.Tags = stringsFromContent(content.Tags)
+	}
+	state.Secret = optionalStringFromContent(content.Secret)
+	if content.PermissionSet != nil {
+		state.PermissionSet = stringsFromContent(content.PermissionSet)
+	}
 
 	// Map JsonScript from API response
 	if content.JsonScript != nil {
@@ -292,11 +321,19 @@ func (r *monitorResource) Update(ctx context.Context, req resource.UpdateRequest
 		return
 	}
 
-	item := r.getMonitorFromPlan(&plan)
+	item, err := r.getMonitorFromPlan(&plan)
+	if err != nil {
+		resp.Diagnostics.AddAttributeError(
+			path.Root("extend"),
+			"Invalid extend JSON",
+			"extend must be a valid JSON object string: "+err.Error(),
+		)
+		return
+	}
 	// Type is not updatable, so we need to set it to empty string to avoid error
 	item.Type = ""
 	content := &api.MonitorContent{}
-	err := r.client.Update(consts.TypeNameMonitor, plan.UUID.ValueString(), item, content)
+	err = r.client.Update(consts.TypeNameMonitor, plan.UUID.ValueString(), monitorUpdateBody(item), content)
 
 	if err != nil {
 		resp.Diagnostics.AddError(
@@ -313,6 +350,83 @@ func (r *monitorResource) Update(ctx context.Context, req resource.UpdateRequest
 	if resp.Diagnostics.HasError() {
 		return
 	}
+}
+
+func monitorUpdateBody(item *api.Monitor) map[string]any {
+	return map[string]any{
+		"status":            item.Status,
+		"extend":            item.Extend,
+		"alertPolicyUUIDs":  emptyStringSliceIfNil(item.AlertPolicyUUIDs),
+		"dashboardUUID":     item.DashboardUUID,
+		"tags":              emptyStringSliceIfNil(item.Tags),
+		"secret":            item.Secret,
+		"jsonScript":        item.JsonScript,
+		"openPermissionSet": item.OpenPermissionSet,
+		"permissionSet":     emptyStringSliceIfNil(item.PermissionSet),
+	}
+}
+
+func emptyStringSliceIfNil(values []string) []string {
+	if values == nil {
+		return []string{}
+	}
+	return values
+}
+
+func optionalStringFromContent(value string) types.String {
+	if value == "" {
+		return types.StringNull()
+	}
+	return types.StringValue(value)
+}
+
+func applyExtendFromContent(state *monitorResourceModel, value any) error {
+	if value == nil {
+		return nil
+	}
+	if extendContainsConfiguredValue(state.Extend, value) {
+		return nil
+	}
+	extend, err := tfconvert.CanonicalJSONFromValue(value)
+	if err != nil {
+		return err
+	}
+	state.Extend = types.StringValue(extend)
+	return nil
+}
+
+func extendContainsConfiguredValue(configured types.String, remote any) bool {
+	if configured.IsNull() || configured.IsUnknown() {
+		return false
+	}
+	var decoded any
+	if err := json.Unmarshal([]byte(configured.ValueString()), &decoded); err != nil {
+		return false
+	}
+	return containsValue(remote, decoded)
+}
+
+func containsValue(remote any, configured any) bool {
+	configuredMap, configuredIsMap := configured.(map[string]any)
+	remoteMap, remoteIsMap := remote.(map[string]any)
+	if configuredIsMap && remoteIsMap {
+		for key, configuredValue := range configuredMap {
+			remoteValue, ok := remoteMap[key]
+			if !ok || !containsValue(remoteValue, configuredValue) {
+				return false
+			}
+		}
+		return true
+	}
+	return reflect.DeepEqual(remote, configured)
+}
+
+func stringsFromContent(values []string) []types.String {
+	result := make([]types.String, len(values))
+	for i, value := range values {
+		result[i] = types.StringValue(value)
+	}
+	return result
 }
 
 // Delete deletes the resource and removes the Terraform state on success.
@@ -342,7 +456,7 @@ func (r *monitorResource) ImportState(ctx context.Context, req resource.ImportSt
 	resource.ImportStatePassthroughID(ctx, path.Root("uuid"), req, resp)
 }
 
-func (r *monitorResource) getMonitorFromPlan(plan *monitorResourceModel) *api.Monitor {
+func (r *monitorResource) getMonitorFromPlan(plan *monitorResourceModel) (*api.Monitor, error) {
 
 	m := &api.Monitor{}
 
@@ -356,9 +470,10 @@ func (r *monitorResource) getMonitorFromPlan(plan *monitorResourceModel) *api.Mo
 
 	if !plan.Extend.IsNull() {
 		var extend interface{}
-		if err := json.Unmarshal([]byte(plan.Extend.ValueString()), &extend); err == nil {
-			m.Extend = extend
+		if err := json.Unmarshal([]byte(plan.Extend.ValueString()), &extend); err != nil {
+			return nil, err
 		}
+		m.Extend = extend
 	}
 
 	if len(plan.AlertPolicyUUIDs) > 0 {
@@ -529,5 +644,5 @@ func (r *monitorResource) getMonitorFromPlan(plan *monitorResourceModel) *api.Mo
 		m.PermissionSet = permissionSet
 	}
 
-	return m
+	return m, nil
 }

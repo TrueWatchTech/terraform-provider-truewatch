@@ -10,15 +10,32 @@ The remainder of this document will focus on the development aspects of the prov
 
 The resource supports as follows:
 
-* [x] pipeline
-* [x] member group
-* [x] black list
-* [x] role
+| Resource | Description |
+| --- | --- |
+| `guance_alert_policy` | Alert routing policy, notification targets, aggregation, silence, escalation, permissions, and checker/security rule bindings. |
+| `guance_alert_policy_notice_date` | Custom alert policy notification date windows. |
+| `guance_blacklist` | Blacklist configuration. |
+| `guance_dashboard` | Dashboard configuration. |
+| `guance_membergroup` | Workspace member groups. |
+| `guance_monitor` | Monitor/checker rules managed with structured Terraform fields. |
+| `guance_monitor_json` | Monitor/checker rules managed with raw JSON payloads. |
+| `guance_mute` | Alert, checker, tag, and custom mute rules. |
+| `guance_notify_object` | Alert notification objects and notification permissions. |
+| `guance_pipeline` | Pipeline configuration. |
+| `guance_role` | Workspace roles. |
 
 The data source supports as follows:
 
-* [x] members
-* [x] permissions
+| Data Source | Description |
+| --- | --- |
+| `guance_alert_policy` | Look up an alert policy by UUID or exact name. |
+| `guance_alert_policy_notice_date` | Look up a custom alert policy notification date by UUID or exact name. |
+| `guance_members` | List workspace members. |
+| `guance_monitor` | Look up a monitor/checker by UUID or exact name. |
+| `guance_monitors` | List monitor/checker rules with filters. |
+| `guance_mute` | Look up a mute rule by UUID or exact name. |
+| `guance_notify_object` | Look up a notification object by UUID or exact name. |
+| `guance_permissions` | List workspace permissions. |
 
 The region supports as follows:
 
@@ -49,7 +66,7 @@ that return all the details about which versions are currently available for a p
 ## Requirements
 
 * [Terraform](https://www.terraform.io/downloads)
-* [Go](https://go.dev/doc/install) (1.19)
+* [Go](https://go.dev/doc/install) (1.26.2)
 
 ## Development
 
@@ -61,7 +78,8 @@ Once a release is cut, the Terraform Registry will download the documentation fr
 and associate it with the release version. Read more about how this works on the
 [official page](https://www.terraform.io/registry/providers/docs).
 
-Use `./hack/make gen:doc` to ensure the documentation is regenerated with any changes.
+Use `make docs` to regenerate documentation and `make check-docs` to verify
+that the generated documentation is up to date.
 
 ### Using a development build
 
@@ -69,13 +87,27 @@ If [running tests and acceptance tests](#testing) aren't enough, it's possible t
 to use a development build of the provider. This can be achieved by leveraging the Terraform CLI
 [configuration file development overrides](https://www.terraform.io/cli/config/config-file#development-overrides-for-provider-developers).
 
-First, use `./hack/make build:install` to place a fresh development build of the provider in your
+First, use `make install` to place a fresh development build of the provider in your
 [`${GOBIN}`](https://pkg.go.dev/cmd/go#hdr-Compile_and_install_packages_and_dependencies)
 (defaults to `${GOPATH}/bin` or `${HOME}/go/bin` if `${GOPATH}` is not set). Repeat
-this is every time you make changes to the provider locally.
+this every time you make changes to the provider locally.
 
 Then, set up your environment following [these instructions](https://www.terraform.io/plugin/debugging#terraform-cli-development-overrides)
-to make you're local terraform use your local build.
+to make your local Terraform CLI use your local build.
+
+### Testing
+
+Run the unit test suite with:
+
+```shell
+make test
+```
+
+Run acceptance tests against a configured Guance environment with:
+
+```shell
+make testacc
+```
 
 ### Testing GitHub Actions
 

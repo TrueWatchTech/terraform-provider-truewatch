@@ -13,13 +13,12 @@ description: |-
   Usage
   ```terraform
   We strongly recommend using the required_providers block to set the
-  Guance Cloud Provider source and version being used
+  Guance Cloud Provider source being used
   terraform {
-    required_version = ">=0.12"
+    required_version = ">= 1.0"
   required_providers {
       guance = {
         source = "GuanceCloud/guance"
-        version = "=0.0.9"
       }
     }
   }
@@ -33,6 +32,28 @@ description: |-
   ```
   More Examples
   Example Source Code https://github.com/GuanceCloud/terraform-provider-guance/tree/main/examples
+  Monitor Module
+  The monitor-related Terraform resources are based on Guance Forethought OpenAPI checker endpoints.
+  Use guance_monitor when you want to manage a monitor/checker with structured Terraform fields. Use guance_monitor_json when you want to import, replace, or manage a monitor from the checker JSON export format.
+  Available monitor resources and data sources:
+  guance_monitor - manages monitor checker rules with structured fields.guance_monitor_json - manages monitor checker rules with JSON import/export semantics.guance_monitor data source - reads one existing monitor/checker by uuid or exact name.guance_monitors data source - lists existing monitors/checkers by search and optional filters.
+  Note: updating guance_monitor.secret from a non-empty value to an empty string currently depends on Forethought OpenAPI behavior. The current OpenAPI implementation accepts the request but keeps the old secret, so avoid using an empty secret to clear an existing value until the OpenAPI contract is adjusted.
+  Alert Module
+  The alert-related Terraform resources are based on Guance Forethought OpenAPI endpoints.
+  Typical dependency flow:
+  ```hcl
+  guancenotifyobject
+    -> guancealertpolicy.alertopt.alerttarget.targets.to
+  guancealertpolicynoticedate
+    -> guancealertpolicy.alertopt.alerttarget.customdateuuids
+  guancealertpolicy
+    -> guancemute.muteranges.alertpolicyuuid
+  ```
+  Available alert resources:
+  guance_notify_object - manages alert notification objects.guance_alert_policy_notice_date - manages custom notice dates for alert policies.guance_alert_policy - manages alert delivery, aggregation, silence, and notification targets.guance_mute - manages mute rules for alert policies, checkers, tags, or custom ranges.
+  Each alert resource also has a matching data source with the same Terraform type name. The data source supports lookup by either uuid or exact name, and fails if name lookup does not return exactly one object.
+  See the guance_alert_policy resource documentation for a full chain example that connects notification objects, custom notice dates, alert policies, and mute rules.
+  Note: the Forethought UI has an alert policy enable/disable route, but it is not exported in the Forethought OpenAPI alert policy module. The Terraform resource manages the exported v2 alert policy fields.
 ---
 
 # guance Provider
@@ -55,14 +76,13 @@ Terraform supports a number of different methods for authenticating to Guance Cl
 
 ```terraform
 # We strongly recommend using the required_providers block to set the
-# Guance Cloud Provider source and version being used
+# Guance Cloud Provider source being used
 terraform {
-  required_version = ">=0.12"
+  required_version = ">= 1.0"
 
   required_providers {
     guance = {
       source = "GuanceCloud/guance"
-      version = "=0.0.9"
     }
   }
 }
@@ -79,6 +99,51 @@ provider "guance" {
 ## More Examples
 
 * [Example Source Code](https://github.com/GuanceCloud/terraform-provider-guance/tree/main/examples)
+
+## Monitor Module
+
+The monitor-related Terraform resources are based on Guance Forethought OpenAPI checker endpoints.
+
+Use `guance_monitor` when you want to manage a monitor/checker with structured Terraform fields. Use `guance_monitor_json` when you want to import, replace, or manage a monitor from the checker JSON export format.
+
+Available monitor resources and data sources:
+
+* `guance_monitor` - manages monitor checker rules with structured fields.
+* `guance_monitor_json` - manages monitor checker rules with JSON import/export semantics.
+* `guance_monitor` data source - reads one existing monitor/checker by `uuid` or exact `name`.
+* `guance_monitors` data source - lists existing monitors/checkers by search and optional filters.
+
+Note: updating `guance_monitor.secret` from a non-empty value to an empty string currently depends on Forethought OpenAPI behavior. The current OpenAPI implementation accepts the request but keeps the old secret, so avoid using an empty secret to clear an existing value until the OpenAPI contract is adjusted.
+
+## Alert Module
+
+The alert-related Terraform resources are based on Guance Forethought OpenAPI endpoints.
+
+Typical dependency flow:
+
+```hcl
+guance_notify_object
+  -> guance_alert_policy.alert_opt.alert_target.targets.to
+
+guance_alert_policy_notice_date
+  -> guance_alert_policy.alert_opt.alert_target.custom_date_uuids
+
+guance_alert_policy
+  -> guance_mute.mute_ranges.alert_policy_uuid
+```
+
+Available alert resources:
+
+* `guance_notify_object` - manages alert notification objects.
+* `guance_alert_policy_notice_date` - manages custom notice dates for alert policies.
+* `guance_alert_policy` - manages alert delivery, aggregation, silence, and notification targets.
+* `guance_mute` - manages mute rules for alert policies, checkers, tags, or custom ranges.
+
+Each alert resource also has a matching data source with the same Terraform type name. The data source supports lookup by either `uuid` or exact `name`, and fails if name lookup does not return exactly one object.
+
+See the `guance_alert_policy` resource documentation for a full chain example that connects notification objects, custom notice dates, alert policies, and mute rules.
+
+Note: the Forethought UI has an alert policy enable/disable route, but it is not exported in the Forethought OpenAPI alert policy module. The Terraform resource manages the exported v2 alert policy fields.
 
 
 

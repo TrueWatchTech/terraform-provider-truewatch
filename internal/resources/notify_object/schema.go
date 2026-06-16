@@ -37,6 +37,7 @@ var resourceSchema = schema.Schema{
 					"slackIncomingWebhook",
 					"teamsWorkflowWebhook",
 					"googleChatWebhook",
+					"telegramBot",
 				),
 			},
 		},
