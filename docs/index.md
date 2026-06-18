@@ -4,7 +4,7 @@ page_title: "truewatch Provider"
 subcategory: ""
 description: |-
   Terraform Provider: TrueWatch
-  The TrueWatch Provider provides resources to manage TrueWatch Cloud https://en.truewatch.com/ resources.
+  The TrueWatch Provider provides resources to manage TrueWatch Cloud https://www.truewatch.com/ resources.
   To learn the basics of Terraform using this provider, follow the hands-on get started tutorials.
   Interested in the provider's latest features, or want to make sure you're up to date? Check out the changelog for version information and release notes.
   Authenticating to TrueWatch Cloud
@@ -60,7 +60,7 @@ description: |-
 
 # Terraform Provider: TrueWatch
 
-The TrueWatch Provider provides resources to manage [TrueWatch Cloud](https://en.truewatch.com/) resources.
+The TrueWatch Provider provides resources to manage [TrueWatch Cloud](https://www.truewatch.com/) resources.
 
 To learn the basics of Terraform using this provider, follow the hands-on get started tutorials.
 

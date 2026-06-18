@@ -1,6 +1,6 @@
 # Terraform Provider: TrueWatch
 
-The TrueWatch Provider provides resources to manage [TrueWatch Cloud](https://en.truewatch.com/) resources.
+The TrueWatch Provider provides resources to manage [TrueWatch Cloud](https://www.truewatch.com/) resources.
 
 To learn the basics of Terraform using this provider, follow the hands-on get started tutorials.
 
