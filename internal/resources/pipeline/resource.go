@@ -4,6 +4,7 @@ import (
 	"context"
 	_ "embed"
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
 
 	"github.com/hashicorp/terraform-plugin-framework/path"
@@ -127,19 +128,7 @@ func (r *pipelineResource) Read(ctx context.Context, req resource.ReadRequest, r
 	state.EnableByLogBackup = types.Int64Value(pl.EnableByLogBackup)
 	state.Category = types.StringValue(pl.Category)
 
-	// only set extend when it's not nil
-	if pl.Extend != nil &&
-		(pl.Extend.AppID != nil || pl.Extend.Measurement != nil || pl.Extend.LoggingIndex != "") {
-		state.Extend = &pipelineExtend{}
-		for _, id := range pl.Extend.AppID {
-			state.Extend.AppID = append(state.Extend.AppID, types.StringValue(id))
-		}
-		for _, m := range pl.Extend.Measurement {
-			state.Extend.Measurement = append(state.Extend.Measurement, types.StringValue(m))
-		}
-
-		state.Extend.LoggingIndex = types.StringValue(pl.Extend.LoggingIndex)
-	}
+	state.Extend = extendFromContent(state.Extend, pl.Extend)
 
 	content, err := base64.StdEncoding.DecodeString(pl.Content)
 	if err != nil {
@@ -195,9 +184,15 @@ func (r *pipelineResource) Update(ctx context.Context, req resource.UpdateReques
 		return
 	}
 
-	item := r.getPipelineFromPlan(&plan)
-	// item.UUID = plan.UUID.ValueString()
 	itemID := plan.UUID.ValueString()
+	item, err := r.getPipelineForUpdate(&plan, &state)
+	if err != nil {
+		resp.Diagnostics.AddError(
+			"Error updating pipeline",
+			"Could not read pipeline before update, unexpected error: "+err.Error(),
+		)
+		return
+	}
 
 	// disable or enable
 	if state.IsDisabled != plan.IsDisabled {
@@ -213,7 +208,7 @@ func (r *pipelineResource) Update(ctx context.Context, req resource.UpdateReques
 	// update pipeline, omit uuid field
 	item.UUID = ""
 	content := &api.Pipeline{}
-	err := r.client.Update(consts.TypeNamePipeline, itemID, item, content)
+	err = r.client.Update(consts.TypeNamePipeline, itemID, item, content)
 	if err != nil {
 		resp.Diagnostics.AddError(
 			"Error updating pipeline",
@@ -298,8 +293,11 @@ func (r *pipelineResource) getPipelineFromPlan(plan *pipelineResourceModel) *api
 			item.Extend.Measurement = measurement
 		}
 
-		if plan.Extend.LoggingIndex.ValueString() != "" {
-			item.Extend.LoggingIndex = plan.Extend.LoggingIndex.ValueString()
+		// "" is a valid value (the console stores "loggingIndex": ""), so
+		// send it whenever logging_index is set, and leave it out when unset.
+		if !plan.Extend.LoggingIndex.IsNull() && !plan.Extend.LoggingIndex.IsUnknown() {
+			loggingIndex := plan.Extend.LoggingIndex.ValueString()
+			item.Extend.LoggingIndex = &loggingIndex
 		}
 	}
 	// set is_force to true when as_default is set to 1
@@ -308,6 +306,112 @@ func (r *pipelineResource) getPipelineFromPlan(plan *pipelineResourceModel) *api
 	}
 
 	return item
+}
+
+// getPipelineForUpdate builds the modify body from the plan. The modify API
+// replaces the whole object, extend included, so the live extend is read first
+// and its keys that this resource does not manage are sent back unchanged.
+//
+// A live loggingIndex is also sent back when neither the prior state nor the
+// plan has logging_index: refresh hides a remote "" in that case (see
+// extendFromContent), so the plan never showed its removal.
+func (r *pipelineResource) getPipelineForUpdate(plan, state *pipelineResourceModel) (*api.Pipeline, error) {
+	item := r.getPipelineFromPlan(plan)
+
+	live := &api.Pipeline{}
+	if err := r.client.Read(consts.TypeNamePipeline, plan.UUID.ValueString(), live); err != nil {
+		return nil, err
+	}
+	keepLiveLoggingIndex := state == nil || state.Extend == nil || state.Extend.LoggingIndex.IsNull()
+	item.Extend = mergeExtend(live.Extend, item.Extend, keepLiveLoggingIndex)
+
+	return item, nil
+}
+
+// mergeExtend returns the extend to send on modify: appID, measurement and
+// loggingIndex come from the plan, every other key comes from the live object.
+// When keepLiveLoggingIndex is true and the plan has no loggingIndex, the live
+// loggingIndex is kept as well.
+func mergeExtend(live, planned *api.PipelineExtend, keepLiveLoggingIndex bool) *api.PipelineExtend {
+	if live == nil {
+		return planned
+	}
+	keepIndex := keepLiveLoggingIndex && live.LoggingIndex != nil &&
+		(planned == nil || planned.LoggingIndex == nil)
+	if len(live.Extra) == 0 && !keepIndex {
+		return planned
+	}
+
+	merged := &api.PipelineExtend{}
+	if len(live.Extra) > 0 {
+		merged.Extra = make(map[string]json.RawMessage, len(live.Extra))
+		for k, v := range live.Extra {
+			merged.Extra[k] = v
+		}
+	}
+	if planned != nil {
+		merged.AppID = planned.AppID
+		merged.Measurement = planned.Measurement
+		merged.LoggingIndex = planned.LoggingIndex
+	}
+	if keepIndex {
+		loggingIndex := *live.LoggingIndex
+		merged.LoggingIndex = &loggingIndex
+	}
+	return merged
+}
+
+// extendFromContent builds the extend state from the remote object.
+//
+// It returns nil when the remote object has none of the managed keys, so that
+// a remote extend that was emptied shows up in the plan instead of the prior
+// state being kept. A remote "loggingIndex": "" is kept as "" (the console
+// writes it, and dropping it is a real change), except when the prior state
+// has extend without logging_index, where "" is the API's default.
+//
+// The API leaves empty appID and measurement lists out, so a list that is
+// empty in the prior state stays empty (not null) when the remote list is
+// absent or empty; a list that is null in the prior state stays null.
+func extendFromContent(prior *pipelineExtend, remote *api.PipelineExtend) *pipelineExtend {
+	if remote == nil || (remote.AppID == nil && remote.Measurement == nil && remote.LoggingIndex == nil) {
+		// an extend block with no attributes set, or only empty lists, is
+		// equivalent to an empty remote extend
+		if prior != nil && len(prior.AppID) == 0 && len(prior.Measurement) == 0 && prior.LoggingIndex.IsNull() {
+			return prior
+		}
+		return nil
+	}
+
+	extend := &pipelineExtend{LoggingIndex: types.StringNull()}
+	var priorAppID, priorMeasurement []types.String
+	if prior != nil {
+		priorAppID, priorMeasurement = prior.AppID, prior.Measurement
+	}
+	extend.AppID = listFromContent(priorAppID, remote.AppID)
+	extend.Measurement = listFromContent(priorMeasurement, remote.Measurement)
+	if remote.LoggingIndex != nil {
+		extend.LoggingIndex = types.StringValue(*remote.LoggingIndex)
+		if *remote.LoggingIndex == "" && prior != nil && prior.LoggingIndex.IsNull() {
+			extend.LoggingIndex = types.StringNull()
+		}
+	}
+	return extend
+}
+
+// listFromContent converts a remote list. An absent or empty remote list is
+// an empty list when the prior state has an empty list, and null otherwise.
+func listFromContent(prior []types.String, remote []string) []types.String {
+	if len(remote) == 0 {
+		if prior != nil && len(prior) == 0 {
+			return []types.String{}
+		}
+		return nil
+	}
+	list := make([]types.String, 0, len(remote))
+	for _, v := range remote {
+		list = append(list, types.StringValue(v))
+	}
+	return list
 }
 
 func (r *pipelineResource) disablePipeline(itemIDs []string, isDisable bool) error {

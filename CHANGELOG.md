@@ -1,3 +1,12 @@
+## Unreleased
+
+### BUGFIXES
+* [truewatch_pipeline] Keep `extend.logging_index = ""` in state when the API returns `"loggingIndex": ""`, and clear `extend` from state when the remote extend no longer has any managed key, so that these changes show up in the plan.
+* [truewatch_pipeline] Keep `extend` keys that the provider does not manage (for example keys written by the console) on update: the live `extend` is read first and merged, because the modify API replaces the whole object.
+* [truewatch_pipeline] Send `"loggingIndex": ""` when `logging_index` is set to an empty string, and stop sending `"appID": null` and `"measurement": null` when those attributes are not set.
+* [truewatch_pipeline] On update, send the live `loggingIndex` back when neither the prior state nor the plan has `logging_index`, so that an update to other attributes does not remove a remote `"loggingIndex": ""` that the plan never showed.
+* [truewatch_pipeline] Keep `extend.app_id = []` and `extend.measurement = []` as empty lists in state when the API leaves those keys out, so that configured empty lists do not produce a diff on every plan.
+
 ## 0.1.0 (June 16, 2026)
 
 ### FEATURES
